@@ -9,6 +9,8 @@ public class NewDriving : MonoBehaviour
     [SerializeField] Rigidbody rb;
     [SerializeField] Transform[] rays;
     [SerializeField] LayerMask driveable;
+    [SerializeField] Transform accelPoint;
+
 
     [SerializeField] float springStiff;
     [SerializeField] float restLength;
@@ -23,7 +25,7 @@ public class NewDriving : MonoBehaviour
 
     [SerializeField] private float accel = 25f;
     [SerializeField] private float maxSpeed = 100f;
-    [SerializeField] private float deceleration = 10f;
+    [SerializeField] private float decel = 10f;
 
 
     private Vector3 currentVelocity = Vector3.zero;
@@ -34,8 +36,9 @@ public class NewDriving : MonoBehaviour
 
     private void FixedUpdate() {
         suspension();
-        GroundCheck();
-        
+        GroundCheck();   
+        CalculateCarVelocity();
+        Movement();
 
     }
 
@@ -69,7 +72,8 @@ public class NewDriving : MonoBehaviour
 
         if(tempGroundedWheels > 1){
             isGrounded = true;
-        }else{
+        }
+        else{
             isGrounded = false;
         }
     }
@@ -118,4 +122,25 @@ public class NewDriving : MonoBehaviour
     }
 
     #endregion
+
+    #region Movement 
+
+    private void Movement(){
+        
+        if(isGrounded){
+            Acceleration();
+            Deceleration();
+        }
+
+    }
+    private void Acceleration(){
+        rb.AddForceAtPosition(accel * moveIn * transform.forward, accelPoint.position, ForceMode.Acceleration);
+    }
+    
+    private void Deceleration(){
+        rb.AddForceAtPosition(decel * moveIn * -transform.forward, accelPoint.position, ForceMode.Acceleration);
+    }
+    
+    #endregion
+
 }
