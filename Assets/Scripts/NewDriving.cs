@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEditor.Callbacks;
 using UnityEngine;
 
@@ -26,6 +27,10 @@ public class NewDriving : MonoBehaviour
     [SerializeField] private float accel = 25f;
     [SerializeField] private float maxSpeed = 100f;
     [SerializeField] private float decel = 10f;
+    [SerializeField] private float steerStrength = 15f;
+    [SerializeField] private AnimationCurve turningCurve;
+    [SerializeField] private float drag;
+
 
 
     private Vector3 currentVelocity = Vector3.zero;
@@ -128,8 +133,14 @@ public class NewDriving : MonoBehaviour
     private void Movement(){
         
         if(isGrounded){
+            Turn();
             Acceleration();
             Deceleration();
+            SidewaysDrag();
+            Debug.Log("isGrounded");
+        }
+        else{
+            Debug.Log("NOT");
         }
 
     }
@@ -139,6 +150,19 @@ public class NewDriving : MonoBehaviour
     
     private void Deceleration(){
         rb.AddForceAtPosition(decel * moveIn * -transform.forward, accelPoint.position, ForceMode.Acceleration);
+    }
+
+    private void Turn(){
+        rb.AddTorque(steerStrength * steerIn * turningCurve.Evaluate(carVelocityRatio) * Mathf.Sign(carVelocityRatio) * transform.up, ForceMode.Acceleration);
+    }
+    
+    private void SidewaysDrag(){
+        float currentSideways = currentVelocity.x;
+
+        float dragMagnitude = -currentSideways * drag;
+
+        Vector3 dragForce = transform.right * dragMagnitude;
+        rb.AddForceAtPosition(dragForce, rb.worldCenterOfMass, ForceMode.Acceleration);
     }
     
     #endregion
