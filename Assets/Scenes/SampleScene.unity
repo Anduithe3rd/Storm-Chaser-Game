@@ -291,6 +291,7 @@ GameObject:
   - component: {fileID: 963194228}
   - component: {fileID: 963194227}
   - component: {fileID: 963194226}
+  - component: {fileID: 963194229}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -366,12 +367,27 @@ Transform:
   m_GameObject: {fileID: 963194225}
   serializedVersion: 2
   m_LocalRotation: {x: 0.20373103, y: -0.14123708, z: 0.02971548, w: 0.9683299}
-  m_LocalPosition: {x: 2.39, y: 2.59, z: -2.09}
+  m_LocalPosition: {x: 4.74, y: 12.67, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 23.763, y: -16.597, z: 0}
+--- !u!114 &963194229
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 963194225}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f6d3ff905719c845a4a6404bc4d4162, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  carTransform: {fileID: 369540143}
+  followSpeed: 2
+  lookSpeed: 5
 --- !u!4 &1062850017 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: a7a42c8bd23ad5248bc750bc59abebf5, type: 3}
@@ -478,7 +494,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 6.1740255, y: 6.1740255, z: 6.1740255}
+  m_LocalScale: {x: 13.37726, y: 13.37726, z: 13.37726}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -494,6 +510,30 @@ PrefabInstance:
     - target: {fileID: 169190554353498430, guid: 3bbd7af542a9f5a49a0dc3987e3da876, type: 3}
       propertyPath: m_Name
       value: Car
+      objectReference: {fileID: 0}
+    - target: {fileID: 2339267761761659330, guid: 3bbd7af542a9f5a49a0dc3987e3da876, type: 3}
+      propertyPath: decel
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 2339267761761659330, guid: 3bbd7af542a9f5a49a0dc3987e3da876, type: 3}
+      propertyPath: restLength
+      value: 0.289
+      objectReference: {fileID: 0}
+    - target: {fileID: 2339267761761659330, guid: 3bbd7af542a9f5a49a0dc3987e3da876, type: 3}
+      propertyPath: wheelRadius
+      value: 0.45
+      objectReference: {fileID: 0}
+    - target: {fileID: 2339267761761659330, guid: 3bbd7af542a9f5a49a0dc3987e3da876, type: 3}
+      propertyPath: steerStrength
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 2339267761761659330, guid: 3bbd7af542a9f5a49a0dc3987e3da876, type: 3}
+      propertyPath: turningCurve.m_PreInfinity
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2339267761761659330, guid: 3bbd7af542a9f5a49a0dc3987e3da876, type: 3}
+      propertyPath: turningCurve.m_PostInfinity
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 5596684063901305311, guid: 3bbd7af542a9f5a49a0dc3987e3da876, type: 3}
       propertyPath: m_LocalPosition.x
