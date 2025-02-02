@@ -8,37 +8,40 @@ using UnityEngine;
 public class NewDriving : MonoBehaviour
 {
     [SerializeField] Rigidbody rb;
-    [SerializeField] Transform[] rays;
-    [SerializeField] LayerMask driveable;
-    [SerializeField] Transform accelPoint;
+    [SerializeField] Transform[] rays; // Array of raycast origins (positioned near each wheel for suspension checks)
+    [SerializeField] LayerMask driveable; // Define what surface we can drive on
+    [SerializeField] Transform accelPoint; // Point where acceleration will be applied
 
-
+    //suspension properties
     [SerializeField] float springStiff;
-    [SerializeField] float restLength;
-    [SerializeField] float springTravel;
+    [SerializeField] float restLength; // Default length of suspension
+    [SerializeField] float springTravel; // Maximum travel distance of suspension
     [SerializeField] float wheelRadius;
+ 
+    [SerializeField] float damperStiff; // Damping force
 
-    [SerializeField] float damperStiff;
-
+    // Player input variables
     private float moveIn = 0;
     private float steerIn = 0;
 
-
-    [SerializeField] private float accel = 25f;
-    [SerializeField] private float maxSpeed = 100f;
-    [SerializeField] private float decel = 10f;
+    // Driving force and steering properties
+    [SerializeField] private float accel = 25f; 
+    [SerializeField] private float maxSpeed = 100f; 
+    [SerializeField] private float decel = 10f; 
     [SerializeField] private float steerStrength = 15f;
-    [SerializeField] private AnimationCurve turningCurve;
-    [SerializeField] private float drag;
+    [SerializeField] private AnimationCurve turningCurve; //Adjusts steering sensitivity based on speed
+    [SerializeField] private float drag; 
 
 
-
+    // Velocity tracking
     private Vector3 currentVelocity = Vector3.zero;
     private float carVelocityRatio = 0;
 
-    private int[] wheelsGround = new int[4];
+    // Ground detection of each wheel
+    private int[] wheelsGround = new int[4]; 
     private bool isGrounded = false;
 
+    // All physics of the Car placed in fixed update for consistency
     private void FixedUpdate() {
         suspension();
         GroundCheck();   
@@ -59,7 +62,7 @@ public class NewDriving : MonoBehaviour
     #region Inputs
 
     private void GetPlayerIn(){
-
+        // Forward/backward input and left/right steering input
         moveIn= Input.GetAxis("Vertical");
         steerIn = Input.GetAxis("Horizontal");
     }
@@ -70,11 +73,11 @@ public class NewDriving : MonoBehaviour
 
     private void GroundCheck(){
         int tempGroundedWheels = 0;
-
+        //how many wheels are grounded
         for(int i = 0; i < wheelsGround.Length; i++){
             tempGroundedWheels += wheelsGround[i];
         }
-
+        //more than one wheel is on the ground so were grounded
         if(tempGroundedWheels > 1){
             isGrounded = true;
         }
@@ -84,8 +87,8 @@ public class NewDriving : MonoBehaviour
     }
 
     private void CalculateCarVelocity(){
-        currentVelocity = transform.InverseTransformDirection(rb.velocity);
-        carVelocityRatio = currentVelocity.z / maxSpeed;
+        currentVelocity = transform.InverseTransformDirection(rb.velocity); 
+        carVelocityRatio = currentVelocity.z / maxSpeed; 
     }
 
     #endregion
@@ -98,25 +101,27 @@ public class NewDriving : MonoBehaviour
         {
 
              RaycastHit hit;
-             float maxLength = restLength + springTravel;
+             float maxLength = restLength + springTravel; // Max suspension stretch
 
-        
+            //Raycast downward to detect ground and simulate suspension
             if(Physics.Raycast(rays[i].position, -rays[i].up, out hit, maxLength + wheelRadius, driveable))
             {
                 wheelsGround[i] = 1;
 
+                // Calculate spring compression
                 float currentSpringLength = hit.distance - wheelRadius;
                 float springCompress = (restLength - currentSpringLength) / springTravel;
 
+                //Calculate damp force
                 float springVelo = Vector3.Dot(rb.GetPointVelocity(rays[i].position), rays[i].up);
                 float dampForce = damperStiff * springVelo;
 
+                //Apply spring and damp force
                 float springForce = springStiff * springCompress;
-
                 float netForce = springForce - dampForce;
 
                 rb.AddForceAtPosition(netForce * rays[i].up, rays[i].position);
-                Debug.DrawLine(rays[i].position, hit.point, Color.red);
+                Debug.DrawLine(rays[i].position, hit.point, Color.red); //debugging line for wheels
             }
             else{
                 wheelsGround[i] = 0;
@@ -131,7 +136,7 @@ public class NewDriving : MonoBehaviour
     #region Movement 
 
     private void Movement(){
-        
+        //if we're on the ground apply all physics of car movement
         if(isGrounded){
             Turn();
             Acceleration();
@@ -145,24 +150,24 @@ public class NewDriving : MonoBehaviour
 
     }
     private void Acceleration(){
-        rb.AddForceAtPosition(accel * moveIn * transform.forward, accelPoint.position, ForceMode.Acceleration);
+        rb.AddForceAtPosition(accel * moveIn * transform.forward, accelPoint.position, ForceMode.Acceleration); //Forward movement
     }
     
     private void Deceleration(){
-        rb.AddForceAtPosition(decel * moveIn * -transform.forward, accelPoint.position, ForceMode.Acceleration);
+        rb.AddForceAtPosition(decel * moveIn * -transform.forward, accelPoint.position, ForceMode.Acceleration); //Braking
     }
 
     private void Turn(){
-        rb.AddTorque(steerStrength * steerIn * turningCurve.Evaluate(carVelocityRatio) * Mathf.Sign(carVelocityRatio) * transform.up, ForceMode.Acceleration);
+        rb.AddTorque(steerStrength * steerIn * turningCurve.Evaluate(carVelocityRatio) * Mathf.Sign(carVelocityRatio) * transform.up, ForceMode.Acceleration); //steering torque
     }
     
     private void SidewaysDrag(){
-        float currentSideways = currentVelocity.x;
+        float currentSideways = currentVelocity.x; //detect sideways movement
 
-        float dragMagnitude = -currentSideways * drag;
+        float dragMagnitude = -currentSideways * drag; //apply drag
 
         Vector3 dragForce = transform.right * dragMagnitude;
-        rb.AddForceAtPosition(dragForce, rb.worldCenterOfMass, ForceMode.Acceleration);
+        rb.AddForceAtPosition(dragForce, rb.worldCenterOfMass, ForceMode.Acceleration); //reduce sliding
     }
     
     #endregion
